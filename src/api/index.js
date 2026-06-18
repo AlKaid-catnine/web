@@ -3,7 +3,7 @@
  * Supports Mock data (for production) and real API (for development)
  */
 
-const useMock = import.meta.env.VITE_USE_MOCK === 'true'
+const useMock = import.meta.env.VITE_USE_MOCK !== 'false'
 
 // ===== Mock Data =====
 const mockProducts = [
