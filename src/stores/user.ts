@@ -1,0 +1,90 @@
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import api, { authAPI, cartAPI, favAPI, type User, type CartItem } from '../api'
+
+export const useUserStore = defineStore('user', () => {
+  const user = ref<User | null>(null)
+  const token = ref<string>(localStorage.getItem('token') || '')
+  const isLoggedIn = computed(() => !!token.value)
+
+  function init() {
+    if (token.value) {
+      authAPI.me().then(res => { user.value = res.data }).catch(() => { logout() })
+    }
+  }
+
+  function login(credentials: { email: string; password: string }) {
+    return authAPI.login(credentials).then(res => {
+      token.value = res.data.token
+      user.value = res.data.user
+      localStorage.setItem('token', token.value)
+      return res
+    })
+  }
+
+  function register(data: { username: string; email: string; password: string; phone?: string }) {
+    return authAPI.register(data).then(res => {
+      token.value = res.data.token
+      user.value = res.data.user
+      localStorage.setItem('token', token.value)
+      return res
+    })
+  }
+
+  function logout() {
+    token.value = ''
+    user.value = null
+    localStorage.removeItem('token')
+  }
+
+  return { user, token, isLoggedIn, init, login, register, logout }
+})
+
+export const useCartStore = defineStore('cart', () => {
+  const items = ref<CartItem[]>([])
+  const totalQty = computed(() => items.value.reduce((s, i) => s + i.qty, 0))
+  const totalPrice = computed(() => items.value.reduce((s, i) => s + i.price * i.qty, 0))
+
+  function init() {
+    if (localStorage.getItem('token')) {
+      cartAPI.list().then(res => { items.value = res.data }).catch(() => {})
+    }
+  }
+
+  function add(productId: number, quantity: number, option: string) {
+    return cartAPI.add({ productId, quantity, option }).then(res => { items.value = res.data })
+  }
+
+  function update(productId: number, qty: number) {
+    return cartAPI.update(productId, { qty }).then(res => { items.value = res.data })
+  }
+
+  function remove(productId: number) {
+    return cartAPI.remove(productId).then(res => { items.value = res.data })
+  }
+
+  return { items, totalQty, totalPrice, init, add, update, remove }
+})
+
+export const useFavStore = defineStore('favorites', () => {
+  const items = ref<any[]>([])
+  const ids = ref<number[]>([])
+  const count = computed(() => ids.value.length)
+
+  function init() {
+    if (localStorage.getItem('token')) {
+      favAPI.list().then(res => { items.value = res.data; ids.value = res.data.map((p: any) => p.id) }).catch(() => {})
+    }
+  }
+
+  function toggle(productId: number) {
+    return favAPI.toggle(productId).then(res => {
+      ids.value = res.data
+      return favAPI.list().then(res2 => { items.value = res2.data })
+    })
+  }
+
+  function isFav(productId: number) { return ids.value.includes(productId) }
+
+  return { items, ids, count, init, toggle, isFav }
+})
