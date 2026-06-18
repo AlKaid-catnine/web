@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import api, { authAPI, cartAPI, favAPI, type User, type CartItem } from '../api'
+import api, { authAPI, cartAPI, favAPI } from '../api'
 
 export const useUserStore = defineStore('user', () => {
-  const user = ref<User | null>(null)
-  const token = ref<string>(localStorage.getItem('token') || '')
+  const user = ref(null)
+  const token = ref(localStorage.getItem('token') || '')
   const isLoggedIn = computed(() => !!token.value)
 
   function init() {
@@ -13,7 +13,7 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  function login(credentials: { email: string; password: string }) {
+  function login(credentials) {
     return authAPI.login(credentials).then(res => {
       token.value = res.data.token
       user.value = res.data.user
@@ -22,7 +22,7 @@ export const useUserStore = defineStore('user', () => {
     })
   }
 
-  function register(data: { username: string; email: string; password: string; phone?: string }) {
+  function register(data) {
     return authAPI.register(data).then(res => {
       token.value = res.data.token
       user.value = res.data.user
@@ -41,7 +41,7 @@ export const useUserStore = defineStore('user', () => {
 })
 
 export const useCartStore = defineStore('cart', () => {
-  const items = ref<CartItem[]>([])
+  const items = ref([])
   const totalQty = computed(() => items.value.reduce((s, i) => s + i.qty, 0))
   const totalPrice = computed(() => items.value.reduce((s, i) => s + i.price * i.qty, 0))
 
@@ -51,15 +51,15 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  function add(productId: number, quantity: number, option: string) {
+  function add(productId, quantity, option) {
     return cartAPI.add({ productId, quantity, option }).then(res => { items.value = res.data })
   }
 
-  function update(productId: number, qty: number) {
+  function update(productId, qty) {
     return cartAPI.update(productId, { qty }).then(res => { items.value = res.data })
   }
 
-  function remove(productId: number) {
+  function remove(productId) {
     return cartAPI.remove(productId).then(res => { items.value = res.data })
   }
 
@@ -67,24 +67,24 @@ export const useCartStore = defineStore('cart', () => {
 })
 
 export const useFavStore = defineStore('favorites', () => {
-  const items = ref<any[]>([])
-  const ids = ref<number[]>([])
+  const items = ref([])
+  const ids = ref([])
   const count = computed(() => ids.value.length)
 
   function init() {
     if (localStorage.getItem('token')) {
-      favAPI.list().then(res => { items.value = res.data; ids.value = res.data.map((p: any) => p.id) }).catch(() => {})
+      favAPI.list().then(res => { items.value = res.data; ids.value = res.data.map(p => p.id) }).catch(() => {})
     }
   }
 
-  function toggle(productId: number) {
+  function toggle(productId) {
     return favAPI.toggle(productId).then(res => {
       ids.value = res.data
       return favAPI.list().then(res2 => { items.value = res2.data })
     })
   }
 
-  function isFav(productId: number) { return ids.value.includes(productId) }
+  function isFav(productId) { return ids.value.includes(productId) }
 
   return { items, ids, count, init, toggle, isFav }
 })

@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { cartAPI, type CartItem } from '../api'
+import { cartAPI } from '../api'
 
 export const useCartStore = defineStore('cart', () => {
-  const items = ref<CartItem[]>([])
+  const items = ref([])
   const totalQty = computed(() => items.value.reduce((s, i) => s + i.qty, 0))
   const totalPrice = computed(() => items.value.reduce((s, i) => s + i.price * i.qty, 0))
 
@@ -13,15 +13,15 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  function add(productId: number, quantity: number, option: string) {
+  function add(productId, quantity, option) {
     return cartAPI.add({ productId, quantity, option }).then(res => { items.value = res.data })
   }
 
-  function update(productId: number, qty: number) {
+  function update(productId, qty) {
     return cartAPI.update(productId, { qty }).then(res => { items.value = res.data })
   }
 
-  function remove(productId: number) {
+  function remove(productId) {
     return cartAPI.remove(productId).then(res => { items.value = res.data })
   }
 

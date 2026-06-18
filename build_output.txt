@@ -1,0 +1,25 @@
+
+> lumiere-vue@1.0.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 42 modules transformed.
+[31mx[39m Build failed in 324ms
+[31merror during build:
+[31msrc/stores/favorites.js (6:24): Expression expected[31m
+file: [36mD:/hermes-爱马仕/lumiere-vue/src/stores/favorites.js:6:24[31m
+[33m
+4: 
+5: export const useFavStore = defineStore('favorites', () => {
+6:   const items = ref<any[]>([])
+                           ^
+7:   const ids = ref<number[]>([])
+8:   const count = computed(() => ids.value.length)
+[31m
+    at getRollupError (file:///D:/hermes-%E7%88%B1%E9%A9%AC%E4%BB%95/lumiere-vue/node_modules/rollup/dist/es/shared/parseAst.js:317:41)
+    at ParseError.initialise (file:///D:/hermes-%E7%88%B1%E9%A9%AC%E4%BB%95/lumiere-vue/node_modules/rollup/dist/es/shared/node-entry.js:14809:28)
+    at convertNode (file:///D:/hermes-%E7%88%B1%E9%A9%AC%E4%BB%95/lumiere-vue/node_modules/rollup/dist/es/shared/node-entry.js:16785:10)
+    at convertProgram (file:///D:/hermes-%E7%88%B1%E9%A9%AC%E4%BB%95/lumiere-vue/node_modules/rollup/dist/es/shared/node-entry.js:16021:12)
+    at Module.setSource (file:///D:/hermes-%E7%88%B1%E9%A9%AC%E4%BB%95/lumiere-vue/node_modules/rollup/dist/es/shared/node-entry.js:17764:24)
+    at async ModuleLoader.addModuleSource (file:///D:/hermes-%E7%88%B1%E9%A9%AC%E4%BB%95/lumiere-vue/node_modules/rollup/dist/es/shared/node-entry.js:21923:13)[39m
